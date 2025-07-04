@@ -1,6 +1,5 @@
-<!-- index.php: Displays list of all reminders with update and delete actions -->
 <?php
-session_start();  // required
+session_start();  
 
 // TEMP SESSION FIX FOR TESTING
 $_SESSION['auth'] = 1;
