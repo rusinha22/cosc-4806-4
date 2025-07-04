@@ -1,3 +1,4 @@
+<!-- index.php: Displays list of all reminders with update and delete actions -->
 <?php
 session_start();  // required
 
