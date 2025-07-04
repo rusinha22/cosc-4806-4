@@ -10,3 +10,4 @@
     </form>
 </div>
 <?php require_once 'app/views/templates/footer.php'; ?>
+<!-- View: Create Reminder Form - Allows user to input and submit a new reminder -->
