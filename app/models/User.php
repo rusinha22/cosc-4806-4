@@ -1,4 +1,5 @@
 <?php
+// User Model - Handles user authentication, registration, and session management
 
 class User {
 
