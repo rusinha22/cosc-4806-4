@@ -1,4 +1,5 @@
 <?php
+// reminders Controller - Handles all Reminder CRUD operations (index, create, store, edit, update, delete)
 
 class reminders extends Controller {
 
