@@ -11,3 +11,4 @@
     </form>
 </div>
 <?php require_once 'app/views/templates/footer.php'; ?>
+<!-- edit.php: View to edit an existing reminder -->
