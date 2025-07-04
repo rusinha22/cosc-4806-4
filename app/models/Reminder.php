@@ -3,7 +3,7 @@
 class Reminder {
 
     public function __construct() {}
-
+//add deleted = 0 condition to filter active reminders only
     public function get_all_reminders($user_id) {
         $db = db_connect();
         $stmt = $db->prepare("SELECT * FROM reminders WHERE user_id = :uid AND deleted = 0");
