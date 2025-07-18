@@ -62,6 +62,7 @@ class User {
         $statement = $db->prepare("INSERT INTO users (username, password) VALUES (:username, :password)");
         $statement->bindValue(':username', $username);
         $statement->bindValue(':password', $hashedPassword);
+      
         return $statement->execute();
     }
 }
