@@ -1,49 +1,106 @@
 <?php
-// reminders Controller - Handles all Reminder CRUD operations (index, create, store, edit, update, delete)
 
 class reminders extends Controller {
 
     public function index() {
-        // TEMP: use hardcoded user ID for now
+        session_start();
+        if (!isset($_SESSION['auth'])) {
+            header('Location: /login');
+            exit;
+        }
+
         $R = $this->model('Reminder');
-        $userId = 1; // change to $_SESSION['userid'] later
+        $userId = $_SESSION['userid'];
         $reminders = $R->get_all_reminders($userId);
 
         $this->view('reminders/index', ['reminders' => $reminders]);
     }
 
     public function create() {
+        session_start();
+        if (!isset($_SESSION['auth'])) {
+            header('Location: /login');
+            exit;
+        }
+
         $this->view('reminders/create');
     }
 
     public function store() {
+        session_start();
+        if (!isset($_SESSION['auth'])) {
+            header('Location: /login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $R = $this->model('Reminder');
-            $R->create_reminder(1, $_POST['subject']); // change 1 to $_SESSION['userid'] later
+            $userId = $_SESSION['userid'];  // Make sure this is "rupsin"
+            $subject = $_POST['subject'];
+
+            if ($R->create_reminder($userId, $subject)) {
+                $_SESSION['reminder_success'] = "Reminder added successfully!";
+            } else {
+                $_SESSION['reminder_error'] = "Failed to add reminder.";
+            }
+
             header('Location: /reminders');
-            die;
+            exit;
         }
     }
 
+
     public function edit($id) {
+        session_start();
+        if (!isset($_SESSION['auth'])) {
+            header('Location: /login');
+            exit;
+        }
+
         $R = $this->model('Reminder');
         $reminder = $R->get_reminder_by_id($id);
+
         $this->view('reminders/edit', ['reminder' => $reminder]);
     }
 
     public function update($id) {
+        session_start();
+        if (!isset($_SESSION['auth'])) {
+            header('Location: /login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $R = $this->model('Reminder');
-            $R->update_reminder($id, $_POST['subject']);
+            $subject = $_POST['subject'];
+
+            if ($R->update_reminder($id, $subject)) {
+                $_SESSION['reminder_success'] = "✅ Reminder updated successfully!";
+            } else {
+                $_SESSION['reminder_error'] = "❌ Failed to update reminder.";
+            }
+
             header('Location: /reminders');
-            die;
+            exit;
         }
     }
 
     public function delete($id) {
+        session_start();
+        if (!isset($_SESSION['auth'])) {
+            header('Location: /login');
+            exit;
+        }
+
         $R = $this->model('Reminder');
-        $R->delete_reminder($id);
+
+        if ($R->delete_reminder($id)) {
+            $_SESSION['reminder_success'] = "🗑️ Reminder deleted successfully!";
+        } else {
+            $_SESSION['reminder_error'] = "❌ Failed to delete reminder.";
+        }
+
         header('Location: /reminders');
-        die;
+        exit;
     }
 }
