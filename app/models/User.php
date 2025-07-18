@@ -22,25 +22,24 @@ class User {
     public function authenticate($username, $password) {
         $username = strtolower($username);
         $db = db_connect();
-        $statement = $db->prepare("SELECT * FROM users WHERE username = :name;");
-        $statement->bindValue(':name', $username);
-        $statement->execute();
-        $rows = $statement->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
+        $stmt->bindValue(':username', $username);
+        $stmt->execute();
+
+        $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($rows && password_verify($password, $rows['password'])) {
             $_SESSION['auth'] = 1;
-            $_SESSION['username'] = ucwords($username);
-            $_SESSION['userid'] = $rows['userid'];
+            $_SESSION['username'] = $username;
+            $_SESSION['userid'] = $rows['id']; // ✅ correct column name
+
             unset($_SESSION['failedAuth']);
-            header('Location: /home');
+            header('Location: /reminders');
             die;
         } else {
-            if (isset($_SESSION['failedAuth'])) {
-                $_SESSION['failedAuth']++; // increment
-            } else {
-                $_SESSION['failedAuth'] = 1;
-            }
-            header('Location: /login');
+            $_SESSION['failedAuth'] = true;
+            header('Location: /home');
             die;
         }
     }
@@ -62,7 +61,34 @@ class User {
         $statement = $db->prepare("INSERT INTO users (username, password) VALUES (:username, :password)");
         $statement->bindValue(':username', $username);
         $statement->bindValue(':password', $hashedPassword);
-      
+
         return $statement->execute();
     }
+    // Returns the user with the most reminders
+    public function mostReminders() {
+        $db = db_connect();
+        $stmt = $db->prepare("
+            SELECT users.username, COUNT(reminders.id) AS count
+            FROM users
+            JOIN reminders ON users.userid = reminders.user_id
+            GROUP BY users.username
+            ORDER BY count DESC
+            LIMIT 1
+        ");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function loginCounts() {
+        $db = db_connect();
+        $stmt = $db->prepare("
+            SELECT username, COUNT(*) as logins
+            FROM logins
+            WHERE attempt = 'good'
+            GROUP BY username
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
